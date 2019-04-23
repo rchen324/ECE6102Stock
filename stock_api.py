@@ -76,7 +76,7 @@ def get_stock_price_history(stock_name, days_num):
     for d in dateslist_datetime:
         d_str = d.strftime("%Y-%m-%d")
         dateslist.append(d_str)
-    filename = "csv/{}_data.csv".format(stock_name)
+    filename = "{}_data.csv".format(stock_name)
     data_file = open(filename, "wb")
     writer = csv.writer(data_file, delimiter=',')
     #get the data through Alpha_Vantage API
@@ -210,3 +210,5 @@ def build_model(stock_name):
     print "Prediction figure saved"
     #plt.show()
     return max_price, min_price, avg_price, trend
+
+get_stock_price_history("GOOGL", 4)
