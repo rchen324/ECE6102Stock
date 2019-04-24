@@ -13,7 +13,7 @@ if __name__ == "__main__":
         q.put(str(msg.value))
         if q.qsize() >= 30:
             q.get()
-        if q.qsize() == 30:
+        if q.qsize() >= 20:
             head = 'date,GOOGL,FB,MSFT\n'
             for elem in list(q):
                 elem[1:-1]
