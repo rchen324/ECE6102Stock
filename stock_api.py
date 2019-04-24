@@ -4,9 +4,11 @@ import time
 import datetime
 from datetime import date
 from alpha_vantage.timeseries import TimeSeries
+from kafka import KafkaProducer
 
 today = datetime.datetime.today()
 today_str = today.strftime("%Y-%m-%d")
+producer = KafkaProducer(bootstrap_servers='localhost:9092')
 
 def stock_price(stock_name, days_num):
     avgs = []
@@ -14,7 +16,7 @@ def stock_price(stock_name, days_num):
     column_num = len(stock_name) + 1
     avgs = [[0 for x in range(column_num)] for y in range(row_num)]
     for s in stock_name:
-        print "Downloading data from alpha vantage for " + s
+        print ("Downloading data from alpha vantage for " + s)
         today = datetime.datetime.today()
         dateslist_datetime = [today - datetime.timedelta(days=x) for x in range(0, days_num)]
         dateslist = []
@@ -34,17 +36,33 @@ def stock_price(stock_name, days_num):
                     avg = (float(r[2]) + float(r[3])) / 2.0
                     avgs[row_id][column_id] = avg
                     avgs[row_id][0] = r[0].split(" ")[0]
-        print "Downloading finished for " + s
+        print ("Downloading finished for " + s)
 
-    print "Final prices are "
-    print avgs
+    print ("Final prices are ")
+    print (avgs)
     header = ["Date"] + stock_name
     filename = "stocks/" + today_str + ".csv".format(stock_name)
-    print "\nWriting data to " + filename
-    data_file = open(filename, "wb")
+    print ("\nWriting data to " + filename)
+    data_file = open(filename, "w")
     writer = csv.writer(data_file, delimiter=',')
+    # header_ = [bytes(h) for h in header]
+    print(header)
     writer.writerow(header)
     for avg_daily in avgs:
         if not all(n == 0 for n in avg_daily):
+            # avg_daily = [str(a).encode for a in avg_daily]
             writer.writerow(avg_daily)
-    print "Writing done"
+            producer.send("test", str(avg_daily).encode())
+            print(str(avg_daily))
+    print ("Writing done")
+
+if __name__ == "__main__":
+    first = True
+    while True:
+        if first:
+            stock_price(["GOOGL", "FB", "MSFT"], 30)
+            first = False
+            time.sleep(86400)
+        else:
+            stock_price(["GOOGL", "FB", "MSFT"], 1)
+
