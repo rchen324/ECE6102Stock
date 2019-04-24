@@ -1,7 +1,7 @@
 TOPICS = "test"
 from kafka import KafkaConsumer
 import queue
-import portfolio
+from portfolio import *
 from io import StringIO
 
 
@@ -16,8 +16,14 @@ if __name__ == "__main__":
         if q.qsize() >= 20:
             head = 'date,GOOGL,FB,MSFT\n'
             for elem in list(q.queue):
-                elem[1:-1]
+                s = str(elem)[3:-2]
                 head += elem
                 head += '\n'
-            print(head)
+            mu, S = calcMuCov2(StringIO(head))
+            cleaned_weights, perf = maxSharpeRatio(mu, S)
+            result = combineWeigPerf(cleaned_weights, perf)
+            print (result)
+
+                
+            # print(head)
         
