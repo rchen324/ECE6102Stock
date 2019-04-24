@@ -54,14 +54,15 @@ def maxSharpeRatio(mu, S):
     cleaned_weights = ef.clean_weights()
 
     perf = ef.portfolio_performance(verbose=True)
-    print(perf)
     return cleaned_weights, perf
 
 def combineWeigPerf(cleaned_weights, perf):
-    cleaned_weights['Return'] = perf[0]
-    cleaned_weights['Volatility'] = perf[1]
-    cleaned_weights['Sharpe'] = perf[2]
-    return cleaned_weights
+    result = {}
+    result['Stock'] = cleaned_weights
+    result['Return'] = perf[0]
+    result['Volatility'] = perf[1]
+    result['Sharpe'] = perf[2]
+    return result
 
 if __name__ == "__main__":
     #pull_stock_price(stock_lis, 30)
