@@ -39,7 +39,6 @@ def stock_price(stock_name, days_num):
         for row in data:
             for r in row or []:
                 if r[0].split(" ")[0] in dateslist:
-<<<<<<< HEAD
                     i += 1
                     prices += (float(r[2]) + float(r[3])) / 2.0
                     print (r)
@@ -58,26 +57,3 @@ if __name__ == "__main__":
         else:
             stock_price(["GOOGL", "FB", "MSFT"], 1)
 
-
-
-=======
-                    row_id = dateslist.index(r[0].split(" ")[0]) + 1
-                    column_id = stock_name.index(s) + 1
-                    avg = (float(r[2]) + float(r[3])) / 2.0
-                    avgs[row_id][column_id] = avg
-                    avgs[row_id][0] = r[0].split(" ")[0]
-        print "Downloading finished for " + s
-
-    print "Final prices are "
-    print avgs
-    header = ["Date"] + stock_name
-    filename = "stocks/" + today_str + ".csv".format(stock_name)
-    print "\nWriting data to " + filename
-    data_file = open(filename, "wb")
-    writer = csv.writer(data_file, delimiter=',')
-    writer.writerow(header)
-    for avg_daily in avgs:
-        if not all(n == 0 for n in avg_daily):
-            writer.writerow(avg_daily)
-    print "Writing done"
->>>>>>> 7b6ee80940020e7b1197865eff89a1258cd439f4
