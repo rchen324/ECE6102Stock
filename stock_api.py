@@ -44,15 +44,7 @@ def stock_price(stock_name, days_num):
     data_file = open(filename, "wb")
     writer = csv.writer(data_file, delimiter=',')
     writer.writerow(header)
-
     for avg_daily in avgs:
         if not all(n == 0 for n in avg_daily):
             writer.writerow(avg_daily)
-
     print "Writing done"
-
-
-
-
-
-stock_price(["GOOGL", "FB", "MSFT"], 30)
