@@ -32,36 +32,35 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 
-from kafka.client import KafkaClient
-from kafka.consumer import SimpleConsumer
-from kafka.producer import SimpleProducer
-
 today = datetime.datetime.today()
 today_str = today.strftime("%Y-%m-%d")
 
-#Connect to Kafka
-client = KafkaClient("ip-10-179-181-24.ec2.internal:6667")
-producer = SimpleProducer(client)
+def stock_price(stock_name, days_num):
+    avgs = []
+    for s in stock_name:
+        print "Downloading data from alpha vantage for " + s
+        today = datetime.datetime.today()
+        dateslist_datetime = [today - datetime.timedelta(days=x) for x in range(0, days_num)]
+        dateslist = []
+        for d in dateslist_datetime:
+            d_str = d.strftime("%Y-%m-%d")
+            dateslist.append(d_str)
+        #filename = "{}_data.csv".format(stock_name)
+        ts = TimeSeries(key='OJC57JXH4SUQN338', output_format='csv')
+        data = ts.get_daily(symbol=s)
+        #write data to corresoinding csv file
+        i = 0
+        prices = 0
+        for row in data:
+            for r in row or []:
+                if r[0].split(" ")[0] in dateslist:
+                    i += 1
+                    prices += (float(r[2]) + float(r[3])) / 2.0
+                    print r
+        avg = prices / float(i)
+        avgs.append((s, avg))
+        print "Downloading finished for " + s
+    print avgs
 
-def push_stock_price_to_Kafka(stock_name, days_num):
-    topic_name = stock_name + "_stock"
-    print "Downloading data from alpha vantage and publishing to " + stock_name + " topic"
-    today = datetime.datetime.today()
-    dateslist_datetime = [today - datetime.timedelta(days=x) for x in range(0, days_num)]
-    dateslist = []
-    for d in dateslist_datetime:
-        d_str = d.strftime("%Y-%m-%d")
-        dateslist.append(d_str)
-    filename = "{}_data.csv".format(stock_name)
-    ts = TimeSeries(key='OJC57JXH4SUQN338', output_format='csv')
-    data = ts.get_intraday(symbol=stock_name, interval="60min", outputsize='full')
-    #write data to corresoinding csv file
-    i = 0
-    for row in data:
-        for r in row or []:
-            if r[0].split(" ")[0] in dateslist:
-                producer.send_messages('topicname', data)
-    print "publishing finished"
 
-
-get_stock_price_history("GOOGL", 4)
+stock_price(["GOOGL", "FB", "MSFT"], 30)
