@@ -52,7 +52,7 @@ def stock_price(stock_name, days_num):
         if not all(n == 0 for n in avg_daily):
             # avg_daily = [str(a).encode for a in avg_daily]
             writer.writerow(avg_daily)
-            producer.send("test", str(avg_daily).encode)
+            producer.send("test", str(avg_daily).encode())
             print(str(avg_daily))
     print ("Writing done")
 
