@@ -18,28 +18,45 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 
 class Results(ndb.Model):
     "Recommendation results"
-    date = ndb.StringProperty(indexed=False)
-    recommendation = ndb.StringProperty(indexed=False)
+    date = ndb.StringProperty(indexed=True)
+    rec = ndb.StringProperty(indexed=False)
 
 class Covariance(ndb.Model):
     "Covariance Matrix for everyday"
-    date = ndb.StringProperty(indexed=False)
-    covariance = ndb.StringProperty(indexed=False)
+    date = ndb.StringProperty(indexed=True)
+    cov = ndb.StringProperty(indexed=False)
 
 class getValues(webapp2.RequestHandler):
     def get(self):
-        covariance_query = Covariance.query(Results.date == today_str)
-        covariance = covariance_query.fetch()
+        #covariance_query = Covariance.query(Results.date == today_str)
+        #covariance_lis = covariance_query.fetch()
 
-        results_query = Results.query(Results.date == today_str)
-        results = results_query.fetch()
-        template_values = {
-            'it': results,
-            'covariance': covariance
-        }
+        #if covariance_lis:
+
+
+
+        #results_query = Results.query(Results.date == today_str)
+        results_query = Results.query()
+        results_lis = results_query.fetch()
+
+        template_values = None
+
+        if results_lis:
+            res_dict = eval(results_lis[0].rec)
+            template_values = {
+                'it':  res_dict['Stock'],
+                'Return': res_dict['Return'],
+                'Volatility': res_dict['Volatility'],
+                'Sharpe': res_dict['Sharpe'],
+            }
+        else:
+            template_values = {
+                'it': {'Google': 1, 'MSFT':2}
+            }
+
         template = JINJA_ENVIRONMENT.get_template('chart.html')
         self.response.write(template.render(template_values))
 
 app = webapp2.WSGIApplication([
-    ('/chart', getValues),
+    ('/', getValues),
 ], debug=True)
