@@ -2,10 +2,9 @@ import pandas as pd
 from pypfopt.efficient_frontier import EfficientFrontier
 from pypfopt import risk_models
 from pypfopt import expected_returns
+from io import StringIO
 
 import datetime
-#from alpha_vantage.timeseries import TimeSeries
-
 from google.cloud import datastore
 datastore_client = datastore.Client()
 
@@ -16,7 +15,17 @@ filepath = "stocks/" + today_str + ".csv"
 
 def calcMuCov(filepath):
     # Read in price data
-    df = pd.read_csv(filepath, parse_dates=True, index_col="date")
+    s = StringIO("date,GOOGL,FB,MSFT\n'2019-04-24', 1266.87, 183.39499999999998, 125.185\n'2019-04-23', 1263.2, 182.85, 124.705\n2019-04-22,1243.855,179.95749999999998,123.285")
+    df = pd.read_csv(s, parse_dates=True, index_col="date")
+
+    # Calculate expected returns and sample covariance
+    mu = expected_returns.mean_historical_return(df)
+    S = risk_models.sample_cov(df)
+
+    return mu, S
+
+def calcMuCov2(strIo):
+    df = pd.read_csv(strIo, parse_dates=True, index_col="date")
 
     # Calculate expected returns and sample covariance
     mu = expected_returns.mean_historical_return(df)
