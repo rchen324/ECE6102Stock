@@ -17,7 +17,7 @@ if __name__ == "__main__":
             head = 'date,GOOGL,FB,MSFT\n'
             for elem in list(q.queue):
                 s = str(elem)[3:-2]
-                head += elem
+                head += s
                 head += '\n'
             mu, S = calcMuCov2(StringIO(head))
             cleaned_weights, perf = maxSharpeRatio(mu, S)
