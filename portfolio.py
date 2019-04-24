@@ -4,38 +4,15 @@ from pypfopt import risk_models
 from pypfopt import expected_returns
 
 import datetime
-from alpha_vantage.timeseries import TimeSeries
+#from alpha_vantage.timeseries import TimeSeries
+
+from google.cloud import datastore
+datastore_client = datastore.Client()
 
 today = datetime.datetime.today()
 today_str = today.strftime("%Y-%m-%d")
 stock_lis = ["GOOGL", "FB", "MSFT"]
 filepath = "stocks/" + today_str + ".csv"
-
-def pull_stock_price(stock_name, days_num):
-    avgs = []
-    for s in stock_name:
-        print ("Downloading data from alpha vantage for " + s)
-        today = datetime.datetime.today()
-        dateslist_datetime = [today - datetime.timedelta(days=x) for x in range(0, days_num)]
-        dateslist = []
-        for d in dateslist_datetime:
-            d_str = d.strftime("%Y-%m-%d")
-            dateslist.append(d_str)
-        #filename = "{}_data.csv".format(stock_name)
-        ts = TimeSeries(key='OJC57JXH4SUQN338', output_format='csv')
-        data = ts.get_daily(symbol=s)
-        #write data to corresoinding csv file
-        i = 0
-        prices = 0
-        for row in data:
-            for r in row or []:
-                if r[0].split(" ")[0] in dateslist:
-                    i += 1
-                    prices += (float(r[2]) + float(r[3])) / 2.0
-                    print (r)
-        avg = prices / float(i)
-        avgs.append((s, avg))
-        print ("Downloading finished for " + s)
 
 def calcMuCov(filepath):
     # Read in price data
@@ -69,4 +46,16 @@ if __name__ == "__main__":
     mu, S = calcMuCov(filepath)
     cleaned_weights, perf = maxSharpeRatio(mu, S)
     result = combineWeigPerf(cleaned_weights, perf)
+    
+    kind = 'Results'
+    name = 'result_'+today_str
+    task_key = datastore_client.key(kind, name)
+
+    task = datastore.Entity(key=task_key)
+    task['date'] = today_str
+    task['rec'] = str(result)
+    datastore_client.put(task)
+
     print (result)
+    
+
