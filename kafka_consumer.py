@@ -1,7 +1,14 @@
 TOPICS = "test"
 from kafka import KafkaConsumer
-consumer = KafkaConsumer(TOPICS, bootstrap_servers='localhost:9092')
+import queue
 
-for msg in consumer:
+
+if __name__ == "__main__":
     
-    print(msg.value)
+    consumer = KafkaConsumer(TOPICS, bootstrap_servers='localhost:9092')
+    q = queue.Queue()
+    for msg in consumer:
+        q.put(str(msg.value))
+        if q.qsize() >= 30:
+            q.get()
+        
