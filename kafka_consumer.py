@@ -32,7 +32,7 @@ if __name__ == "__main__":
             task['date'] = today_str
             task['rec'] = str(result)
             datastore_client.put(task)
-            print (result)
+            # print (result)
 
                 
             # print(head)
