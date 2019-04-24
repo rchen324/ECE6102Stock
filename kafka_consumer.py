@@ -15,7 +15,7 @@ if __name__ == "__main__":
             q.get()
         if q.qsize() >= 20:
             head = 'date,GOOGL,FB,MSFT\n'
-            for elem in list(q):
+            for elem in list(q.queue):
                 elem[1:-1]
                 head += elem
                 head += '\n'
